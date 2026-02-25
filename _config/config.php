@@ -1,6 +1,6 @@
 <?php
-require_once __DIR__ . '/../buslogic/BusLogicV1.php';
-require_once __DIR__ . '/../buslogic/BusLogicV2.php';
+require_once __DIR__ . '/../_buslogic/BusLogicV1.php';
+require_once __DIR__ . '/../_buslogic/BusLogicV2.php';
 $CITIES = [
     "bg" => [
         "name" => "Beograd",
