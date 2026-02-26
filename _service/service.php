@@ -1,9 +1,10 @@
 <?php
-require_once "../_config/config.php";
-require_once "../_parser/parser.php";
+require_once __DIR__ . "/../_config/config.php";
+require_once __DIR__ . "/../_parser/parser.php";
 
 function is_valid_city($city)
 {
+    global $CITIES;
     return isset($CITIES[$city]);
 }
 
