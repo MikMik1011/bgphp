@@ -39,6 +39,9 @@ require_once "_config/config.php";
 
     <h1>BG++</h1>
     <h3 id="motto">Fixamo fix ideje since 2023</h3>
+    <a href="#" onclick="document.getElementById('fair-usage-modal').style.display='block';return false;">
+        Fair Usage Policy
+    </a>
 
     <form id="myForm">
         <label for="city">Grad:</label>
@@ -52,21 +55,17 @@ require_once "_config/config.php";
 
         <label for="searchMode">Tip pretrage:</label>
         <select id="searchMode" name="searchMode" onchange="onSearchModeChange()">
-            <option value="id">ID stanice</option>
-            <option value="name">Ime stanice</option>
+            <option value="name">Ime/ID stanice</option>
             <option value="coords">Lokacija</option>
-            <option value="address" disabled>Adresa (uskoro)</option>
             <option value="favorites" disabled>Omiljene stanice (uskoro)</option>
         </select>
 
-        <div class="id-search" style="display:none">
-            <label for="id-input">ID stanice:</label>
-            <input type="number" id="id-input" inputmode="numeric">
-        </div>
 
         <div class="name-search" style="display:none">
             <label for="name-input">Ime/ID stanice:</label>
-            <select class="select2" id="name-input" onchange="toggleTable()"></select>
+            <select class="select2" id="name-input" onchange="toggleTable()">
+                <option> Dobavljanje liste stanica, molimo sacekajte... </option>
+            </select>
         </div>
 
         <div class="coords-search" style="display:none">
@@ -109,7 +108,6 @@ require_once "_config/config.php";
                     <th>Linija</th>
                     <th>ETA</th>
                     <th>Stanice</th>
-                    <th>Trenutna stanica</th>
                     <th>ID vozila</th>
                 </tr>
             </thead>
@@ -118,12 +116,6 @@ require_once "_config/config.php";
 
         <div id="map"></div>
     </div>
-
-    <footer style="margin-top:40px;text-align:center;font-size:14px;opacity:0.8">
-        <a href="#" onclick="document.getElementById('fair-usage-modal').style.display='block';return false;">
-            Fair Usage Policy
-        </a>
-    </footer>
 
     <div
         id="fair-usage-modal"
@@ -138,6 +130,7 @@ require_once "_config/config.php";
         backdrop-filter:blur(3px);
         padding:40px;
         overflow:auto;
+        z-index:999999999;
     ">
         <div
             style="
@@ -189,6 +182,7 @@ require_once "_config/config.php";
                 style="margin-top:20px;padding:8px 14px;cursor:pointer">
                 Close
             </button>
+
         </div>
     </div>
 

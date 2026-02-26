@@ -56,6 +56,7 @@ const doAsyncRequest = async (url, type, data, errorHandler) => {
 };
 
 const fetchCityStations = async (city) => {
+  $("#name-input").html("<option> Dobavljanje liste stanica, molimo sacekajte... </option>");
   let response = await doAsyncRequest(`/api/stations?city=${city}`);
   allStations[city] = response.data;
   console.log(allStations);
@@ -92,7 +93,6 @@ const getCity = () => {
 
 const onCityChange = async () => {
   let city = getCity();
-  changeBg(city);
   moveMapToCityCentre(city);
   if (!allStations[city]) await fetchCityStations(city);
   else fillNameSearch(city);
@@ -137,9 +137,10 @@ const handleTabIn = () => {
 };
 
 const updateArrivals = (response, recenter) => {
+  console.log(response);
   let date = new Date();
 
-  let name = `${response.name} (${response.id})`;
+  let name = `${response.station.name} (${response.station.id})`;
   $("#stationName").html(`Stanica: ${name}`);
   $("#lastUpdated").html(
     `Poslednji put ažurirano: ${date.toLocaleTimeString()}`
@@ -150,42 +151,35 @@ const updateArrivals = (response, recenter) => {
   toggleTable();
 
   layerGroup.clearLayers();
-  console.log(response.coords);
-  if (recenter) map.setView(response.coords, 13, { animation: true });
+  if (recenter) map.setView(response.station.coords, 13, { animation: true });
 
   markers = [];
-  markers.push(createMarker(response.coords, "", "yellow", name));
+  markers.push(createMarker(response.station.coords, "", "yellow", name));
 
-  if (checkLineSorting() && response.vehicles.length > 0) {
-    response.vehicles.sort((a, b) => {
-      return a.lineNumber != b.lineNumber && a.lineName !== b.lineName
-        ? a.lineNumber - b.lineNumber
-        : a.secondsLeft - b.secondsLeft;
-    });
-  } else response.vehicles.reverse();
-
-  const tableData = response.vehicles
-    .map((value) => {
-      markers.push(
-        createMarker(value.coords, value.lineNumber, "blue", value.garageNo)
-      );
-      if (!value.stationName) value.stationName = "¯\\_(ツ)_/¯";
-      return `<tr>
-                    <td>${value.lineNumber}</td>
-                    <td>${formatSeconds(value.secondsLeft)}</td>
-                    <td>${value.stationsBetween}</td>
-                    <td>${value.stationName}</td>
-                    <td>${value.garageNo}</td>
-                </tr>`;
+  const tableData = response.lines
+    .map((line) => {
+      return line.arrivals.map((arrival) => {
+        markers.push(
+          createMarker(arrival.coords, line.lineNumber, "blue", arrival.garageNo)
+        );
+        return `<tr>
+                      <td>${line.lineNumber}</td>
+                      <td>${formatSeconds(arrival.etaSeconds)}</td>
+                      <td>${arrival.etaStations}</td>
+                      <td>${arrival.garageNo}</td>
+                  </tr>`;
+      });
+      
     })
     .join("");
+    console.log(tableData);
   $("#tableBody").html(tableData);
   let group = L.featureGroup(markers).addTo(layerGroup);
   if (recenter) map.fitBounds(group.getBounds());
 };
 
 const fetchArrivals = async (city, query, recenter) => {
-  let url = `/api/arrivals?city=${city}&uid=${$.param(query)}`;
+  let url = `/api/arrivals?city=${city}&${$.param(query)}`;
   $("#updateInProgress").show();
   $("#error").hide();
 

@@ -1,6 +1,5 @@
 <?php
-require_once "../_config/config.php";
-require_once "../_parser/parser.php";
+require_once "../_service/service.php";
 
 header('Content-Type: application/json; charset=utf-8');
 
@@ -20,11 +19,10 @@ if (!isset($CITIES[$cityKey])) {
     ]);
     exit;
 }
-$city = $CITIES[$cityKey];
 
-$stations = $city['repo']->getAllStations();
-$parsedStations = parseStations($stations);
+$stations = get_stations($cityKey);
+
 echo json_encode([
     'status' => 'success',
-    'data' => $parsedStations
+    'data' => array_values($stations)
 ]);

@@ -1,6 +1,5 @@
 <?php
-require_once "../_config/config.php";
-require_once "../_parser/parser.php";
+require_once "../_service/service.php";
 
 header('Content-Type: application/json; charset=utf-8');
 
@@ -15,14 +14,13 @@ $cityKey = $_GET['city'];
 
 $city = $CITIES[$cityKey];
 
-if (!isset($city)) {
+if (!isset($CITIES[$cityKey])) {
     echo json_encode([
         'status' => 'error',
         'message' => 'City not found'
     ]);
     exit;
 }
-
 
 if (!isset($_GET['uid'])) {
     echo json_encode([
@@ -31,12 +29,18 @@ if (!isset($_GET['uid'])) {
     ]);
     exit;
 }
+
+$stations = get_stations($cityKey);
+
 $uid = $_GET['uid'];
+$station = $stations[$uid] ?? null;
 
+$arrivals = get_arrivals($cityKey, $uid);
 
-$arrivals = $city['repo']->getStationArrivals($uid);
-$parsedArrivals = parseArrivals($arrivals);
 echo json_encode([
     'status' => 'success',
-    'data' => $parsedArrivals
+    'data' => [
+        'station' => $station,
+        'lines' => array_values($arrivals)
+    ]
 ]);

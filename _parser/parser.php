@@ -3,8 +3,7 @@
 function parseStations($stations) {
     $result = [];
     foreach ($stations['stations'] as $station) {
-        $id_uppercase = strtoupper($station['station_id']);
-        $result[$id_uppercase] = [
+        $result[$station['id']] = [
             'name' => $station['name'],
             'uid' => $station['id'],
             'id' => $station['station_id'],
@@ -14,7 +13,7 @@ function parseStations($stations) {
             ],
         ];
     }
-    return array_values($result);
+    return $result;
 }
 
 function parseArrivals($arrivals) {
@@ -23,7 +22,7 @@ function parseArrivals($arrivals) {
         return $result;
     }
     
-    foreach ($arrivals as $arrival) {
+    foreach (array_reverse($arrivals) as $arrival) {
         $line_number = $arrival['line_number'];
         $parsedArrival = [
             'etaSeconds' => $arrival['seconds_left'] ?? 0,
