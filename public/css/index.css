@@ -1,6 +1,6 @@
 :root {
-  --bg-top: #edf2f7;
-  --bg-bottom: #edf2f7;
+  --bg-top: #e7edf5;
+  --bg-bottom: #dce5ef;
   --card-bg: #243140;
   --card-bg-hover: #243140;
   --text-main: #eaf1f9;
@@ -8,13 +8,18 @@
   --accent: #24c4a4;
   --accent-strong: #24c4a4;
   --border: #3b4f66;
+  --link-main: #0f5d85;
+  --link-hover: #0a4a69;
   --shadow: none;
 }
 
 body {
   font-family: Arial, sans-serif;
   text-align: center;
-  background: linear-gradient(160deg, var(--bg-top), var(--bg-bottom));
+  background:
+    radial-gradient(1200px 500px at 10% -10%, rgba(36, 196, 164, 0.14), transparent 55%),
+    radial-gradient(1000px 450px at 90% -20%, rgba(15, 93, 133, 0.13), transparent 55%),
+    linear-gradient(165deg, var(--bg-top), var(--bg-bottom));
   margin: 0;
   padding: 0;
   color: #112033;
@@ -254,6 +259,17 @@ button:hover {
 
 .coords-search #search-by-gps-btn {
   margin-bottom: 14px;
+}
+
+.coords-search #stationsMaxDistance-label {
+  text-align: center;
+  margin: 0 0 8px;
+}
+
+.coords-search #stationsMaxDistance-input {
+  display: block;
+  width: min(100%, 320px);
+  margin: 0 auto 14px;
 }
 
 .coords-search label[for="coords-input"] {
@@ -582,6 +598,25 @@ thead {
 }
 
 a, a:visited, a:link, a:active {
-  color: #0a5f8c;
+  color: var(--link-main);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 2px;
+}
+
+a:hover {
+  color: var(--link-hover);
+}
+
+.profile-links a,
+.profile-links a:visited,
+.profile-links a:link,
+.profile-links a:active {
+  color: var(--accent);
+  text-decoration: none;
+}
+
+.profile-links a:hover {
+  color: #21b395;
   text-decoration: underline;
 }

@@ -76,3 +76,5 @@ Automated tests are not set up yet (no PHPUnit config currently in repo). For no
 - Remove dead PHP helpers when unreferenced (verify via `rg` before deletion) to keep services lean.
 - Persist index workflow state in cookies: selected city (`bgpp_city`) and search mode tab (`bgpp_search_mode`) should be restored on load; URL query params still override restored defaults.
 - Session policy is centralized in `src/service/session_service.php` via `start_secure_session()`: 30-day cookie lifetime, `HttpOnly`, `SameSite=Lax`, strict cookie-only session settings, and `Secure` enabled automatically on HTTPS.
+- In location search mode, keep the max-distance range slider visually centered (label + slider track) using dedicated `#stationsMaxDistance-*` rules instead of generic input styling.
+- Keep the UI flat but not plain: prefer subtle layered gradients for page backgrounds and ensure global link colors come from theme variables (`--link-main`, `--link-hover`) with profile quick-links explicitly using accent styling.
