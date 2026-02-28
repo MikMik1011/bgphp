@@ -51,3 +51,22 @@ Automated tests are not set up yet (no PHPUnit config currently in repo). For no
 - Keep `public/js/script.js` as a thin bootstrap that only initializes the index app.
 - Avoid inline JavaScript handlers in `public/index.php`; bind UI events from `public/js/index/app.js`.
 - Fair Usage modal open/close interactions are also bound from JS (`app.js`) via element IDs, not inline attributes.
+- Shared page styling should use centralized CSS variables in `public/css/index.css` (`:root`) and reuse card/accent tokens instead of hardcoded per-rule colors.
+- Visual style preference: keep UI flat (no drop shadows, no 3D depth effects); prioritize clean spacing, alignment, and consistent card widths for structure.
+- Index layout should follow a two-step workflow structure (`Step 1: Find a Station`, `Step 2: Live Arrivals`) using a responsive grid that stacks on mobile.
+- Keep auth forms (`login/register`) narrow via `.page-shell form` constraints; only `#myForm` on index should use full workflow column width.
+- Profile page should surface username prominently in a dedicated profile header/hero block, with quick actions (`Back to home`, `Logout`) grouped near the greeting.
+- Station selection UX on index should expose explicit mode toggles and a live selection status summary (city/mode/station) before arrivals are started.
+- Index submit action should be stateful: enable only when a station is selected for the active mode and keep workflow status chips synchronized with user selections.
+- Mode selection on index is tab-only (`.mode-toggle-btn` + hidden `#searchMode`); do not render a visible “Tip pretrage” select.
+- Mode tabs must directly toggle `.name-search` / `.coords-search` visibility in JS without relying on `<option>` iteration.
+- Apply theme-consistent styling to Select2 controls/dropdowns in `public/css/index.css` (`.select2-*`) so they match native form fields.
+- When Select2 defaults override theme colors, use higher-specificity `.select2-container--default ...` rules (and `!important` if required) to enforce dropdown/search/input colors.
+- Keep vertical spacing explicit around Select2 controls (especially in `.coords-search`) so dropdown fields are not visually glued to action buttons.
+- Keep a dedicated top margin on `#submit` and explicit bottom margin on Select2 containers to preserve separation before the main submit action.
+- Keep Select2 single-select control height aligned with native input/select height to avoid slimmer visual appearance.
+- For Select2 single selects, vertically center text with flex (`display:flex; align-items:center`) on `.select2-selection__rendered` instead of relying on large line-height values.
+- On mobile, keep map width constrained to its card (`#map { width: 100%; }`) and tune control/table spacing for readability; avoid `100vw` inside padded cards.
+- For two-button mode tabs on mobile, use strict equal grid columns (`repeat(2, minmax(0,1fr))`) and `box-sizing: border-box` to prevent horizontal overflow.
+- Workflow containers that use `width: 100%` with padding/border (e.g., `#result`, `#myForm`) must use `box-sizing: border-box` to avoid mobile overflow.
+- Location-search helpers must defensively normalize/validate station coordinates and skip malformed entries instead of throwing on `station.coords`.

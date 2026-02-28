@@ -50,8 +50,18 @@ foreach ($favorites as $favorite) {
     <div class="page-shell">
         <h1>BG++</h1>
         <h3 class="subtitle">Profile</h3>
+        <div class="profile-hero">
+            <div class="profile-hero-label">Account</div>
+            <div class="profile-hero-username">@<?php echo htmlspecialchars($_SESSION['user']['username'], ENT_QUOTES, 'UTF-8'); ?></div>
+        </div>
         <div class="card-panel">
-            <p>Welcome, <strong id="username"><?php echo htmlspecialchars($_SESSION['user']['username'], ENT_QUOTES, 'UTF-8'); ?></strong></p>
+            <div class="profile-header-row">
+                <p class="profile-greeting">Welcome, <strong id="username"><?php echo htmlspecialchars($_SESSION['user']['username'], ENT_QUOTES, 'UTF-8'); ?></strong></p>
+                <div class="profile-links">
+                    <a href="index.php">Back to home</a>
+                    <a href="logout.php">Logout</a>
+                </div>
+            </div>
             <p id="profile-message" style="display:none"></p>
             <table class="data-table">
                 <thead>
@@ -80,8 +90,6 @@ foreach ($favorites as $favorite) {
                 </tbody>
             </table>
         </div>
-        <a href="index.php">Back to home</a> /
-        <a href="logout.php">Logout</a>
     </div>
     <script>
         const profileMessage = document.getElementById('profile-message');

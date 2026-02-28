@@ -43,104 +43,112 @@ $loggedInUser = $_SESSION['user'] ?? null;
 </head>
 
 <body class="body">
-
-    <h1>BG++</h1>
-    <h3 id="motto">Fixamo fix ideje since 2023</h3>
-    <?php if ($loggedInUser): ?>
-        <p>
-            Logged in as
-            <strong><?php echo htmlspecialchars($loggedInUser['username'], ENT_QUOTES, 'UTF-8'); ?></strong>
-            -
-            <a href="profile.php">Profile</a>
-            /
-            <a href="logout.php">Logout</a>
-        </p>
-    <?php else: ?>
-        <p><a href="login.php">Login</a> / <a href="register.php">Register</a></p>
-    <?php endif; ?>
-    <a href="#" id="open-fair-usage-link">
-        Fair Usage Policy
-    </a>
-
-    <form id="myForm">
-        <label for="city">Grad:</label>
-        <select id="city" name="city">
-            <?php
-            foreach ($CITIES as $key => $city) {
-                echo "<option value=\"$key\">{$city['name']}</option>";
-            }
-            ?>
-        </select>
-
-        <label for="searchMode">Tip pretrage:</label>
-        <select id="searchMode" name="searchMode">
-            <option value="name">Ime/ID stanice</option>
-            <option value="coords">Lokacija</option>
-            <option value="favorites" disabled>Omiljene stanice (uskoro)</option>
-        </select>
-
-
-        <div class="name-search" style="display:none">
-            <label for="name-input">Ime/ID stanice:</label>
-            <select class="select2" id="name-input">
-                <option> Dobavljanje liste stanica, molimo sacekajte... </option>
-            </select>
+    <div class="workflow-shell">
+        <div class="workflow-header">
+            <h1>BG++</h1>
+            <h3 id="motto">Fixamo fix ideje since 2023</h3>
         </div>
 
-        <div class="coords-search" style="display:none">
-            <button type="button" id="search-by-gps-btn">Pronadji najbliže stanice</button>
-
-            <label id="stationsMaxDistance-label">Najveća udaljenost (350m):</label>
-            <input
-                type="range"
-                id="stationsMaxDistance-input"
-                min="50"
-                max="1000"
-                value="350"
-                step="50"
-                >
-
-            <label for="coords-input">Stanica:</label>
-            <select class="select2" id="coords-input" style="display:none"></select>
-        </div>
-
-        <input id="submit" type="submit" value="Kad će mi bus?">
-
-        <div id="sort-data-wrapper">
-            <label for="dataSaver">Ušteda podataka:</label>
-            <input type="checkbox" id="dataSaver" checked>
-
-            <label for="sort-lines">Sortiranje linija:</label>
-            <input type="checkbox" id="sort-lines">
-        </div>
-
-    </form>
-
-    <div id="result">
-        <p id="stationName"></p>
-        <p id="lastUpdated"></p>
-        <p id="updateInProgress" style="display:none">Ažuriranje u toku...</p>
-        <p id="error" style="display:none">Greška pri ažuriranju</p>
         <?php if ($loggedInUser): ?>
-            <div id="favorite-toggle-wrapper" style="display:none">
-                <button type="button" id="favorite-toggle-btn"></button>
-                <p id="favorite-message" style="display:none"></p>
-            </div>
+            <p>
+                Logged in as
+                <strong><?php echo htmlspecialchars($loggedInUser['username'], ENT_QUOTES, 'UTF-8'); ?></strong>
+                -
+                <a href="profile.php">Profile</a>
+                /
+                <a href="logout.php">Logout</a>
+            </p>
+        <?php else: ?>
+            <p><a href="login.php">Login</a> / <a href="register.php">Register</a></p>
         <?php endif; ?>
+        <a href="#" id="open-fair-usage-link">
+            Fair Usage Policy
+        </a>
 
-        <table id="tabela" border="2" style="display:none">
-            <thead>
-                <tr>
-                    <th>Linija</th>
-                    <th>ETA</th>
-                    <th>Stanice</th>
-                    <th>ID vozila</th>
-                </tr>
-            </thead>
-            <tbody id="tableBody"></tbody>
-        </table>
+        <div class="workflow-grid">
+            <section class="workflow-step">
+                <form id="myForm">
+                    <div class="mode-toggle" role="tablist" aria-label="Search mode">
+                        <button type="button" class="mode-toggle-btn active" data-mode="name">By Name</button>
+                        <button type="button" class="mode-toggle-btn" data-mode="coords">By Location</button>
+                    </div>
+                    <input type="hidden" id="searchMode" name="searchMode" value="name">
 
-    <div id="map"></div>
+                    <label for="city">Grad:</label>
+                    <select id="city" name="city">
+                        <?php
+                        foreach ($CITIES as $key => $city) {
+                            echo "<option value=\"$key\">{$city['name']}</option>";
+                        }
+                        ?>
+                    </select>
+
+                    <div class="name-search" style="display:none">
+                        <label for="name-input">Ime/ID stanice:</label>
+                        <select class="select2" id="name-input">
+                            <option> Dobavljanje liste stanica, molimo sacekajte... </option>
+                        </select>
+                    </div>
+
+                    <div class="coords-search" style="display:none">
+                        <button type="button" id="search-by-gps-btn">Pronadji najbliže stanice</button>
+
+                        <label id="stationsMaxDistance-label">Najveća udaljenost (350m):</label>
+                        <input
+                            type="range"
+                            id="stationsMaxDistance-input"
+                            min="50"
+                            max="1000"
+                            value="350"
+                            step="50"
+                            >
+
+                        <label for="coords-input">Stanica:</label>
+                        <select class="select2" id="coords-input" style="display:none"></select>
+                    </div>
+
+                    <input id="submit" type="submit" value="Kad će mi bus?">
+
+                    <div id="sort-data-wrapper">
+                        <label for="dataSaver">Ušteda podataka:</label>
+                        <input type="checkbox" id="dataSaver" checked>
+
+                        <label for="sort-lines">Sortiranje linija:</label>
+                        <input type="checkbox" id="sort-lines">
+                    </div>
+
+                </form>
+            </section>
+
+            <section class="workflow-step">
+                <div id="result">
+                    <p id="stationName"></p>
+                    <p id="lastUpdated"></p>
+                    <p id="updateInProgress" style="display:none">Ažuriranje u toku...</p>
+                    <p id="error" style="display:none">Greška pri ažuriranju</p>
+                    <?php if ($loggedInUser): ?>
+                        <div id="favorite-toggle-wrapper" style="display:none">
+                            <button type="button" id="favorite-toggle-btn"></button>
+                            <p id="favorite-message" style="display:none"></p>
+                        </div>
+                    <?php endif; ?>
+
+                    <table id="tabela" border="2" style="display:none">
+                        <thead>
+                            <tr>
+                                <th>Linija</th>
+                                <th>ETA</th>
+                                <th>Stanice</th>
+                                <th>ID vozila</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tableBody"></tbody>
+                    </table>
+
+                    <div id="map"></div>
+                </div>
+            </section>
+        </div>
     </div>
 
     <?php if ($loggedInUser): ?>

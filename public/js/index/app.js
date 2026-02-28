@@ -24,6 +24,7 @@
     toggleTable() {
       const shouldShow = Boolean(state.currQuery);
       $("table").css("display", shouldShow ? "table" : "none");
+      $("#result-empty").toggle(!shouldShow);
     },
 
     updateArrivalsMeta(response) {
@@ -47,12 +48,22 @@
       this.toggleTable();
       $("#stationName").hide();
       $("#lastUpdated").hide();
+      this.updateSubmitState();
       window.BGPP.Favorites.updateToggle(state);
     },
 
     setLoading(flag) {
       $("#updateInProgress").toggle(flag);
       if (flag) $("#error").hide();
+    },
+
+    updateSubmitState() {
+      const mode = state.getSearchMode();
+      const selectedUid = state.getSelectedStationUid();
+      const canSubmit = Boolean(selectedUid && (mode === "name" || mode === "coords"));
+      $("#submit").prop("disabled", !canSubmit);
+      $("#submit").css("opacity", canSubmit ? "1" : "0.6");
+      $("#submit").css("cursor", canSubmit ? "pointer" : "not-allowed");
     },
   };
 
@@ -109,15 +120,18 @@
         stations.fillNameSearch(cityKey);
       }
 
+      ui.updateSubmitState();
       window.BGPP.Favorites.updateToggle(state);
     },
 
     onSearchModeChange() {
       const searchMode = state.getSearchMode();
-      $("#searchMode option").toArray().forEach((option) => {
-        const value = $(option).val();
+      ["name", "coords"].forEach((value) => {
         $(`.${value}-search`).toggle(value === searchMode);
       });
+      $(".mode-toggle-btn").removeClass("active");
+      $(`.mode-toggle-btn[data-mode='${searchMode}']`).addClass("active");
+      ui.updateSubmitState();
       window.BGPP.Favorites.updateToggle(state);
     },
 
@@ -148,7 +162,7 @@
           $("#coords-input").val(uid).trigger("change");
         });
       } catch (_error) {
-        $("#error").html("Greška pri dobavljanju lokacije.").show();
+        $("#error").html(`Greška pri dobavljanju lokacije: ${_error}`).show();
       }
     },
 
@@ -170,7 +184,13 @@
     $("#city").on("change", handlers.onCityChange);
     $("#searchMode").on("change", handlers.onSearchModeChange);
     $("#name-input").on("change", () => ui.toggleTable());
-    $("#coords-input").on("change", () => ui.toggleTable());
+    $("#name-input").on("change", () => {
+      ui.updateSubmitState();
+    });
+    $("#coords-input").on("change", () => {
+      ui.toggleTable();
+      ui.updateSubmitState();
+    });
 
     $("#stationsMaxDistance-input").on("change", function onRangeChange() {
       $("#stationsMaxDistance-label").html(`Najveća udaljenost (${this.value}m):`);
@@ -181,6 +201,10 @@
     });
 
     $("#search-by-gps-btn").on("click", handlers.searchByGps);
+    $(".mode-toggle-btn").on("click", function onModeToggle() {
+      const mode = $(this).data("mode");
+      $("#searchMode").val(mode).trigger("change");
+    });
 
     $("#myForm").on("submit", (event) => {
       event.preventDefault();
@@ -226,6 +250,7 @@
     bindEvents();
     handlers.onSearchModeChange();
     await handlers.onCityChange();
+    ui.updateSubmitState();
 
     await window.BGPP.Favorites.load();
     window.BGPP.Favorites.updateToggle(state);

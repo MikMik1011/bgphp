@@ -40,15 +40,38 @@
   });
 
   const findClosestStations = (userLocation, stationsArray, maxDistance = 300) => {
-    return stationsArray
+    const normalizeCoords = (station) => {
+      const raw = station?.coords;
+
+      if (Array.isArray(raw) && raw.length >= 2) {
+        const lat = Number(raw[0]);
+        const lon = Number(raw[1]);
+        if (Number.isFinite(lat) && Number.isFinite(lon)) return [lat, lon];
+        return null;
+      }
+
+      if (raw && typeof raw === "object") {
+        const lat = Number(raw.lat ?? raw.latitude);
+        const lon = Number(raw.lng ?? raw.lon ?? raw.longitude);
+        if (Number.isFinite(lat) && Number.isFinite(lon)) return [lat, lon];
+      }
+
+      return null;
+    };
+
+    return (stationsArray || [])
       .map((station) => {
+        const coords = normalizeCoords(station);
+        if (!coords) return null;
+
         const distance = getDistanceFromCoords(
           userLocation.latitude,
           userLocation.longitude,
-          ...station.coords
+          ...coords
         );
         return { station, distance: Math.round(distance) };
       })
+      .filter(Boolean)
       .filter((entry) => entry.distance <= maxDistance)
       .sort((a, b) => a.distance - b.distance);
   };
