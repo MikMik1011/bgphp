@@ -481,6 +481,14 @@ button:focus {
   margin: 0;
 }
 
+.data-table tbody tr[data-city] {
+  cursor: pointer;
+}
+
+.data-table tbody tr[data-city]:hover {
+  background: rgba(36, 196, 164, 0.08);
+}
+
 th, td {
   border: 1px solid var(--border);
   padding: 10px;

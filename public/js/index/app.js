@@ -1,4 +1,6 @@
 (() => {
+  const urlParams = new URLSearchParams(window.location.search);
+
   const state = {
     currInterval: null,
     currQuery: null,
@@ -177,6 +179,34 @@
     },
   };
 
+  const bootstrapFromUrl = async () => {
+    const cityFromUrl = (urlParams.get("city") || "").trim();
+    const uidFromUrl = (urlParams.get("uid") || "").trim();
+
+    if (!cityFromUrl) return;
+
+    const cityExists = $("#city option").toArray().some((option) => option.value === cityFromUrl);
+    if (!cityExists) return;
+
+    if (state.getCityRaw() !== cityFromUrl) {
+      $("#city").val(cityFromUrl);
+      await handlers.onCityChange();
+    }
+
+    if (!uidFromUrl) return;
+
+    $("#searchMode").val("name").trigger("change");
+
+    const stationExists = $("#name-input option").toArray().some((option) => option.value === uidFromUrl);
+    if (!stationExists) {
+      $("#error").html("Stanica iz linka nije pronađena za izabrani grad.").show();
+      return;
+    }
+
+    $("#name-input").val(uidFromUrl).trigger("change");
+    handlers.submitByName();
+  };
+
   const bindEvents = () => {
     $(window).on("blur", handlers.onTabOut);
     $(window).on("focus", handlers.onTabIn);
@@ -250,6 +280,7 @@
     bindEvents();
     handlers.onSearchModeChange();
     await handlers.onCityChange();
+    await bootstrapFromUrl();
     ui.updateSubmitState();
 
     await window.BGPP.Favorites.load();

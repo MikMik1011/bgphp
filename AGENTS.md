@@ -70,3 +70,5 @@ Automated tests are not set up yet (no PHPUnit config currently in repo). For no
 - For two-button mode tabs on mobile, use strict equal grid columns (`repeat(2, minmax(0,1fr))`) and `box-sizing: border-box` to prevent horizontal overflow.
 - Workflow containers that use `width: 100%` with padding/border (e.g., `#result`, `#myForm`) must use `box-sizing: border-box` to avoid mobile overflow.
 - Location-search helpers must defensively normalize/validate station coordinates and skip malformed entries instead of throwing on `station.coords`.
+- Index supports deep links via query params: `?city=<cityKey>` preselects city; `?city=<cityKey>&uid=<stationUid>` auto-selects station in name mode and starts arrivals.
+- Profile favorites rows act as quick links to index deep links; keep remove-button behavior separate from row-click navigation.
