@@ -1,7 +1,7 @@
 <?php
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     require_once __DIR__ . '/../src/service/user_service.php';
-    $username = $_POST['username'] ?? '';
+    $username = trim($_POST['username'] ?? '');
     $password = $_POST['password'] ?? '';
 
     try {
@@ -20,7 +20,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login</title>
+    <title>Login | BGPHP</title>
     <link rel="stylesheet" href="css/index.css">
 </head>
 
@@ -33,10 +33,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <?php endif; ?>
         <form action="" method="POST">
             <label for="username">Username:</label>
-            <input type="text" id="username" name="username" required>
+            <input
+                type="text"
+                id="username"
+                name="username"
+                required
+                maxlength="64"
+                autocomplete="username">
 
             <label for="password">Password:</label>
-            <input type="password" id="password" name="password" required>
+            <input
+                type="password"
+                id="password"
+                name="password"
+                required
+                minlength="8"
+                autocomplete="current-password">
 
             <button type="submit">Login</button>
         </form>

@@ -78,3 +78,6 @@ Automated tests are not set up yet (no PHPUnit config currently in repo). For no
 - Session policy is centralized in `src/service/session_service.php` via `start_secure_session()`: 30-day cookie lifetime, `HttpOnly`, `SameSite=Lax`, strict cookie-only session settings, and `Secure` enabled automatically on HTTPS.
 - In location search mode, keep the max-distance range slider visually centered (label + slider track) using dedicated `#stationsMaxDistance-*` rules instead of generic input styling.
 - Keep the UI flat but not plain: prefer subtle layered gradients for page backgrounds and ensure global link colors come from theme variables (`--link-main`, `--link-hover`) with profile quick-links explicitly using accent styling.
+- Auth forms should enforce matching client/server rules: username pattern `^[A-Za-z0-9_.-]{3,32}$`, password min 8 with at least one letter and one digit, and register must include/validate `confirm_password`.
+- Tighten API inputs at the edge: trim incoming `city`/`uid`/`action`, require numeric station `uid` via `ctype_digit`, cap favorite notes at 255 chars, and return explicit 4xx JSON errors for invalid/missing params.
+- Shared API JSON error helper lives in `src/utils/http_response.php` (`respond_with_error`); avoid redefining it inside each endpoint.

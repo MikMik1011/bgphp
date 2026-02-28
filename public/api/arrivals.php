@@ -1,37 +1,33 @@
 <?php
 require_once __DIR__ . "/../../src/service/bgpp_service.php";
+require_once __DIR__ . "/../../src/utils/http_response.php";
 
 header('Content-Type: application/json; charset=utf-8');
 
 if (!isset($_GET['city'])) {
-    echo json_encode([
-        'status' => 'error',
-        'message' => 'City parameter is required'
-    ]);
-    exit;
+    respond_with_error('City parameter is required', 400);
 }
-$city_key = $_GET['city'];
+$city_key = trim($_GET['city']);
 
 if (!isset($CITIES[$city_key])) {
-    echo json_encode([
-        'status' => 'error',
-        'message' => 'City not found'
-    ]);
-    exit;
+    respond_with_error('City not found', 404);
 }
 
 if (!isset($_GET['uid'])) {
-    echo json_encode([
-        'status' => 'error',
-        'message' => 'Station UID parameter is required'
-    ]);
-    exit;
+    respond_with_error('Station UID parameter is required', 400);
 }
 
 $stations = get_stations($city_key);
 
-$uid = $_GET['uid'];
+$uid = trim((string) $_GET['uid']);
+if ($uid === '' || !ctype_digit($uid)) {
+    respond_with_error('Station UID must be a positive integer', 400);
+}
+
 $station = $stations[$uid] ?? null;
+if (!$station) {
+    respond_with_error('Station not found', 404);
+}
 
 $arrivals = get_arrivals($city_key, $uid);
 

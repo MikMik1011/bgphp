@@ -36,8 +36,8 @@ try {
         throw new HTTPException("Method not allowed", 405);
     }
 
-    $action = $_POST['action'] ?? '';
-    $city_key = $_POST['city'] ?? '';
+    $action = trim($_POST['action'] ?? '');
+    $city_key = trim($_POST['city'] ?? '');
     $uid = $_POST['uid'] ?? null;
     $note = $_POST['note'] ?? null;
 
@@ -45,16 +45,30 @@ try {
         throw new HTTPException("City and uid are required", 400);
     }
 
+    $uid = trim((string) $uid);
+    if ($uid === '' || !ctype_digit($uid)) {
+        throw new HTTPException("UID must be a positive integer", 400);
+    }
+
     if (!is_valid_city($city_key)) {
         throw new HTTPException("City not found", 404);
     }
 
+    if (!in_array($action, ['add', 'remove'], true)) {
+        throw new HTTPException("Invalid action", 400);
+    }
+
+    if ($note !== null) {
+        $note = trim((string) $note);
+        if (strlen($note) > 255) {
+            throw new HTTPException("Note is too long (max 255 chars)", 400);
+        }
+    }
+
     if ($action === 'add') {
         add_station_to_favorites($city_key, $uid, $note);
-    } elseif ($action === 'remove') {
-        remove_station_from_favorites($city_key, $uid);
     } else {
-        throw new HTTPException("Invalid action", 400);
+        remove_station_from_favorites($city_key, $uid);
     }
 
     echo json_encode([
