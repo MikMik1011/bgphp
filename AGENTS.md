@@ -83,3 +83,6 @@ Automated tests are not set up yet (no PHPUnit config currently in repo). For no
 - Shared API JSON error helper lives in `src/utils/http_response.php` (`respond_with_error`); avoid redefining it inside each endpoint.
 - Index background supports city-driven imagery from `public/pics/`: on city change, set `--city-bg-image` to `/pics/<city_key>.jpg` and reset to `none` if missing; keep gradients behind it as fallback only (no blend/tint over the city image).
 - Keep page background coverage consistent across long/short pages by rendering the layered background on `html` (root canvas) and keeping `body` transparent with `min-height: 100vh`; use `background-attachment: scroll` layers to avoid top white-strip artifacts.
+- CSRF is mandatory for all state-changing requests: use `src/service/csrf_service.php`, include hidden `csrf_token` in HTML forms, and send `X-CSRF-Token` (or `csrf_token`) for JS/API `POST` requests.
+- Apply baseline hardening headers on public/API entry points via `src/utils/security_headers.php` (`apply_security_headers`).
+- Avoid DOM XSS sinks for untrusted data in frontend code: prefer `.text()` and DOM node construction over `.html()` string interpolation for API-fed content.

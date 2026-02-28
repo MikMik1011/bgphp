@@ -1,4 +1,12 @@
 <?php
+require_once __DIR__ . '/../src/service/session_service.php';
+require_once __DIR__ . '/../src/service/csrf_service.php';
+require_once __DIR__ . '/../src/utils/security_headers.php';
+
+apply_security_headers();
+start_secure_session();
+$csrf_token = get_csrf_token();
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     require_once __DIR__ . '/../src/service/user_service.php';
     $username = trim($_POST['username'] ?? '');
@@ -6,6 +14,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $confirm_password = $_POST['confirm_password'] ?? '';
 
     try {
+        require_valid_csrf_token_or_throw();
         if ($password !== $confirm_password) {
             throw new HTTPException("Password and confirmation do not match.", 400);
         }
@@ -35,6 +44,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <div class="error"><?= htmlspecialchars($error_message) ?></div>
         <?php endif; ?>
         <form action="" method="POST">
+            <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($csrf_token, ENT_QUOTES, 'UTF-8') ?>">
             <label for="username">Username:</label>
             <input
                 type="text"

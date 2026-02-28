@@ -9,7 +9,8 @@
 
     set(name, value, days = 30) {
       const expires = new Date(Date.now() + days * 24 * 60 * 60 * 1000).toUTCString();
-      document.cookie = `${name}=${encodeURIComponent(value)}; expires=${expires}; path=/; SameSite=Lax`;
+      const secure = window.location.protocol === "https:" ? "; Secure" : "";
+      document.cookie = `${name}=${encodeURIComponent(value)}; expires=${expires}; path=/; SameSite=Lax${secure}`;
     },
   };
 
@@ -62,15 +63,15 @@
     updateArrivalsMeta(response) {
       const date = new Date();
       const name = `${response.station.name} (${response.station.id})`;
-      $("#stationName").html(`Stanica: ${name}`).show();
-      $("#lastUpdated").html(`Poslednji put ažurirano: ${date.toLocaleTimeString()}`).show();
+      $("#stationName").text(`Stanica: ${name}`).show();
+      $("#lastUpdated").text(`Poslednji put ažurirano: ${date.toLocaleTimeString()}`).show();
       $("#updateInProgress").hide();
     },
 
     showArrivalsError(error) {
       $("#updateInProgress").hide();
       const message = error?.responseJSON?.message || "Unknown error";
-      $("#error").html(`Greška pri ažuriranju podataka: ${message}`).show();
+      $("#error").text(`Greška pri ažuriranju podataka: ${message}`).show();
     },
 
     resetResults() {
@@ -101,7 +102,9 @@
 
   const stations = {
     async loadCity(cityKey) {
-      $("#name-input").html("<option> Dobavljanje liste stanica, molimo sacekajte... </option>");
+      $("#name-input").empty().append(
+        $("<option>").text("Dobavljanje liste stanica, molimo sacekajte...")
+      );
       const response = await window.BGPP.API.fetchStations(cityKey);
       state.allStations[cityKey] = response?.data || [];
       this.fillNameSearch(cityKey);
@@ -109,8 +112,15 @@
 
     fillNameSearch(cityKey) {
       const list = state.allStations[cityKey] || [];
-      const options = list.map((station) => `<option value="${station.uid}">${station.name} (${station.id})</option>`);
-      $("#name-input").html(options);
+      const select = $("#name-input");
+      select.empty();
+      list.forEach((station) => {
+        select.append(
+          $("<option>")
+            .val(String(station.uid))
+            .text(`${station.name} (${station.id})`)
+        );
+      });
     },
   };
 
@@ -197,7 +207,7 @@
           $("#coords-input").val(uid).trigger("change");
         });
       } catch (_error) {
-        $("#error").html(`Greška pri dobavljanju lokacije: ${_error}`).show();
+        $("#error").text(`Greška pri dobavljanju lokacije: ${_error}`).show();
       }
     },
 
@@ -247,7 +257,7 @@
 
     const stationExists = $("#name-input option").toArray().some((option) => option.value === uidFromUrl);
     if (!stationExists) {
-      $("#error").html("Stanica iz linka nije pronađena za izabrani grad.").show();
+      $("#error").text("Stanica iz linka nije pronađena za izabrani grad.").show();
       return;
     }
 
@@ -271,7 +281,7 @@
     });
 
     $("#stationsMaxDistance-input").on("change", function onRangeChange() {
-      $("#stationsMaxDistance-label").html(`Najveća udaljenost (${this.value}m):`);
+      $("#stationsMaxDistance-label").text(`Najveća udaljenost (${this.value}m):`);
     });
 
     $("#sort-lines").on("change", () => {

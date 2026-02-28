@@ -1,8 +1,12 @@
 <?php
 require_once __DIR__ . '/../src/service/fav_service.php';
 require_once __DIR__ . '/../src/service/bgpp_service.php';
+require_once __DIR__ . '/../src/service/csrf_service.php';
+require_once __DIR__ . '/../src/utils/security_headers.php';
 
+apply_security_headers();
 start_secure_session();
+$csrf_token = get_csrf_token();
 if (!isset($_SESSION['user'])) {
     header("Location: /login.php");
     exit();
@@ -42,6 +46,7 @@ foreach ($favorites as $favorite) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="<?php echo htmlspecialchars($csrf_token, ENT_QUOTES, 'UTF-8'); ?>">
     <title>BGPHP | Profile</title>
     <link rel="stylesheet" href="/css/index.css">
 </head>
@@ -94,6 +99,7 @@ foreach ($favorites as $favorite) {
     <script>
         const profileMessage = document.getElementById('profile-message');
         const favoritesBody = document.getElementById('favorites-table-body');
+        const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content || '';
 
         const showProfileMessage = (message, isError) => {
             profileMessage.textContent = message;
@@ -130,6 +136,7 @@ foreach ($favorites as $favorite) {
                 params.set('action', 'remove');
                 params.set('city', city);
                 params.set('uid', uid);
+                params.set('csrf_token', csrfToken);
 
                 try {
                     const response = await fetch('/api/favorites.php', {

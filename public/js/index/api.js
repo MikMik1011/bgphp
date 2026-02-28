@@ -1,11 +1,20 @@
 (() => {
+  const getCsrfToken = () => $("meta[name='csrf-token']").attr("content") || "";
+
   const request = async (url, method = "GET", data = {}, errorHandler) => {
     if (!url) throw new Error("No url provided");
     try {
+      const upperMethod = String(method).toUpperCase();
+      const headers = {};
+      if (upperMethod === "POST") {
+        headers["X-CSRF-Token"] = getCsrfToken();
+      }
+
       return await $.ajax({
         url,
-        type: method,
+        type: upperMethod,
         data,
+        headers,
       });
     } catch (error) {
       if (errorHandler) {

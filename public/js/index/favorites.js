@@ -47,7 +47,14 @@
       const icon = isFavorite ? "★" : "☆";
       const label = isFavorite ? " Remove from favorites" : " Add to favorites";
 
-      button.html(`<span class="favorite-icon" aria-hidden="true">${icon}</span>${label}`);
+      button.empty();
+      button.append(
+        $("<span>")
+          .addClass("favorite-icon")
+          .attr("aria-hidden", "true")
+          .text(icon)
+      );
+      button.append(document.createTextNode(label));
       wrapper.show();
     },
 

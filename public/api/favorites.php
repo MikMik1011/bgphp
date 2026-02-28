@@ -1,7 +1,10 @@
 <?php
 require_once __DIR__ . "/../../src/service/fav_service.php";
 require_once __DIR__ . "/../../src/service/bgpp_service.php";
+require_once __DIR__ . "/../../src/service/csrf_service.php";
+require_once __DIR__ . "/../../src/utils/security_headers.php";
 
+apply_security_headers();
 header('Content-Type: application/json; charset=utf-8');
 
 try {
@@ -35,6 +38,7 @@ try {
     if ($method !== 'POST') {
         throw new HTTPException("Method not allowed", 405);
     }
+    require_valid_csrf_token_or_throw();
 
     $action = trim($_POST['action'] ?? '');
     $city_key = trim($_POST['city'] ?? '');

@@ -1,8 +1,13 @@
 <?php
 require_once __DIR__ . "/../src/config/config.php";
 require_once __DIR__ . "/../src/service/session_service.php";
+require_once __DIR__ . "/../src/service/csrf_service.php";
+require_once __DIR__ . "/../src/utils/security_headers.php";
+
+apply_security_headers();
 start_secure_session();
 $logged_in_user = $_SESSION['user'] ?? null;
+$csrf_token = get_csrf_token();
 ?>
 
 <!doctype html>
@@ -12,6 +17,7 @@ $logged_in_user = $_SESSION['user'] ?? null;
     <meta charset="UTF-8">
     <title>BGPHP</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="<?php echo htmlspecialchars($csrf_token, ENT_QUOTES, 'UTF-8'); ?>">
 
     <link rel="stylesheet" href="css/index.css">
 

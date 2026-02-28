@@ -17,10 +17,14 @@
   const createMarker = (coords, name, color, popupText) => {
     const marker = new L.marker(coords, { icon: colorIcon(color || "blue") });
     if (popupText) {
-      marker.bindPopup(popupText, { autoClose: false, closeOnClick: false });
+      const popupNode = document.createElement("span");
+      popupNode.textContent = String(popupText);
+      marker.bindPopup(popupNode, { autoClose: false, closeOnClick: false });
     }
     if (name) {
-      marker.bindTooltip(name, {
+      const tooltipNode = document.createElement("span");
+      tooltipNode.textContent = String(name);
+      marker.bindTooltip(tooltipNode, {
         permanent: true,
         direction: "center",
         className: "my-labels",
@@ -66,17 +70,20 @@
       const rows = response.lines
         .flatMap((line) => line.arrivals.map((arrival) => {
           markers.push(createMarker(arrival.coords, line.lineNumber, "blue", arrival.garageNo));
-          return `
-            <tr>
-              <td>${line.lineNumber}</td>
-              <td>${window.BGPP.Helpers.formatSeconds(arrival.etaSeconds)}</td>
-              <td>${arrival.etaStations}</td>
-              <td>${arrival.garageNo}</td>
-            </tr>`;
+          return { line, arrival };
         }))
-        .join("");
+      ;
 
-      $("#tableBody").html(rows);
+      const tableBody = $("#tableBody");
+      tableBody.empty();
+      rows.forEach(({ line, arrival }) => {
+        const row = $("<tr>");
+        row.append($("<td>").text(String(line.lineNumber)));
+        row.append($("<td>").text(window.BGPP.Helpers.formatSeconds(arrival.etaSeconds)));
+        row.append($("<td>").text(String(arrival.etaStations)));
+        row.append($("<td>").text(String(arrival.garageNo)));
+        tableBody.append(row);
+      });
       const group = L.featureGroup(markers).addTo(this.layerGroup);
       if (recenter) this.map.fitBounds(group.getBounds());
     },
@@ -87,15 +94,22 @@
       const markers = [];
       markers.push(createMarker([searchCoords.latitude, searchCoords.longitude], "", "green"));
 
-      const options = closestStations.map((entry) => {
+      const select = $(optionSelector);
+      select.empty();
+
+      closestStations.forEach((entry) => {
         const marker = createMarker(entry.station.coords, entry.station.id, "yellow");
         marker.on("click", () => onMarkerClick(entry.station.uid));
         markers.push(marker);
 
-        return `<option value="${entry.station.uid}">${entry.station.name} (${entry.station.id}) | ${entry.distance}m</option>`;
+        select.append(
+          $("<option>")
+            .val(String(entry.station.uid))
+            .text(`${entry.station.name} (${entry.station.id}) | ${entry.distance}m`)
+        );
       });
 
-      $(optionSelector).html(options).trigger("change");
+      select.trigger("change");
       const group = L.featureGroup(markers).addTo(this.layerGroup);
       this.map.fitBounds(group.getBounds());
     },
