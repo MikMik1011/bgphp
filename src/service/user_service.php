@@ -14,7 +14,14 @@ function create_user($username, $password, $db = new DB())
     $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
     $sql = "INSERT INTO users (username, password) VALUES (:username, :password)";
     $db->query($sql, ['username' => $username, 'password' => $hashedPassword]);
-    return get_user_by_username($username, $db);
+    $user = get_user_by_username($username, $db);
+    unset($user['password']);
+    if (session_status() !== PHP_SESSION_ACTIVE) {
+        session_start();
+    }
+    $_SESSION['user'] = $user;
+
+    return $user;
 }
 
 function update_user_password($username, $oldPassword, $newPassword, $db = new DB())

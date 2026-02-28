@@ -45,3 +45,9 @@ Automated tests are not set up yet (no PHPUnit config currently in repo). For no
 - Treat credentials in `docker-compose.yml` and `src/config/config.ini` as local-only defaults.
 - Do not commit production secrets.
 - Sanitize and validate all user input in public endpoints and auth-related flows.
+
+## Current Frontend Notes
+- Index page JavaScript is split under `public/js/index/` (`api.js`, `helpers.js`, `map.js`, `favorites.js`, `app.js`).
+- Keep `public/js/script.js` as a thin bootstrap that only initializes the index app.
+- Avoid inline JavaScript handlers in `public/index.php`; bind UI events from `public/js/index/app.js`.
+- Fair Usage modal open/close interactions are also bound from JS (`app.js`) via element IDs, not inline attributes.

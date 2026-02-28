@@ -32,12 +32,17 @@ $loggedInUser = $_SESSION['user'] ?? null;
         rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
-    <script src="js/script.js"></script>
     <script src="js/mapLayers.js"></script>
+    <script src="js/index/api.js"></script>
+    <script src="js/index/helpers.js"></script>
+    <script src="js/index/map.js"></script>
+    <script src="js/index/favorites.js"></script>
+    <script src="js/index/app.js"></script>
+    <script src="js/script.js"></script>
 
 </head>
 
-<body class="body" onload="toggleTable()">
+<body class="body">
 
     <h1>BG++</h1>
     <h3 id="motto">Fixamo fix ideje since 2023</h3>
@@ -53,13 +58,13 @@ $loggedInUser = $_SESSION['user'] ?? null;
     <?php else: ?>
         <p><a href="login.php">Login</a> / <a href="register.php">Register</a></p>
     <?php endif; ?>
-    <a href="#" onclick="document.getElementById('fair-usage-modal').style.display='block';return false;">
+    <a href="#" id="open-fair-usage-link">
         Fair Usage Policy
     </a>
 
     <form id="myForm">
         <label for="city">Grad:</label>
-        <select id="city" name="city" onchange="onCityChange()">
+        <select id="city" name="city">
             <?php
             foreach ($CITIES as $key => $city) {
                 echo "<option value=\"$key\">{$city['name']}</option>";
@@ -68,7 +73,7 @@ $loggedInUser = $_SESSION['user'] ?? null;
         </select>
 
         <label for="searchMode">Tip pretrage:</label>
-        <select id="searchMode" name="searchMode" onchange="onSearchModeChange()">
+        <select id="searchMode" name="searchMode">
             <option value="name">Ime/ID stanice</option>
             <option value="coords">Lokacija</option>
             <option value="favorites" disabled>Omiljene stanice (uskoro)</option>
@@ -77,13 +82,13 @@ $loggedInUser = $_SESSION['user'] ?? null;
 
         <div class="name-search" style="display:none">
             <label for="name-input">Ime/ID stanice:</label>
-            <select class="select2" id="name-input" onchange="toggleTable()">
+            <select class="select2" id="name-input">
                 <option> Dobavljanje liste stanica, molimo sacekajte... </option>
             </select>
         </div>
 
         <div class="coords-search" style="display:none">
-            <button type="button" onclick="searchByGPS()">Pronadji najbliže stanice</button>
+            <button type="button" id="search-by-gps-btn">Pronadji najbliže stanice</button>
 
             <label id="stationsMaxDistance-label">Najveća udaljenost (350m):</label>
             <input
@@ -93,10 +98,10 @@ $loggedInUser = $_SESSION['user'] ?? null;
                 max="1000"
                 value="350"
                 step="50"
-                onchange="$('#stationsMaxDistance-label').html(`Najveća udaljenost (${this.value}m):`)">
+                >
 
             <label for="coords-input">Stanica:</label>
-            <select class="select2" id="coords-input" onchange="toggleTable()" style="display:none"></select>
+            <select class="select2" id="coords-input" style="display:none"></select>
         </div>
 
         <input id="submit" type="submit" value="Kad će mi bus?">
@@ -106,7 +111,7 @@ $loggedInUser = $_SESSION['user'] ?? null;
             <input type="checkbox" id="dataSaver" checked>
 
             <label for="sort-lines">Sortiranje linija:</label>
-            <input type="checkbox" id="sort-lines" onchange="if(currQuery) submitHandlers[getSearchMode()]()">
+            <input type="checkbox" id="sort-lines">
         </div>
 
     </form>
@@ -212,9 +217,7 @@ $loggedInUser = $_SESSION['user'] ?? null;
                 This policy may change at any time. Continued use indicates acceptance.
             </p>
 
-            <button
-                onclick="document.getElementById('fair-usage-modal').style.display='none';"
-                style="margin-top:20px;padding:8px 14px;cursor:pointer">
+            <button id="close-fair-usage-btn" style="margin-top:20px;padding:8px 14px;cursor:pointer">
                 Close
             </button>
 

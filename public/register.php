@@ -9,11 +9,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         header("Location: index.php");
         exit();
     } catch (HTTPException $e) {
-        $message = htmlspecialchars($e->getMessage(), ENT_QUOTES, 'UTF-8');
-        echo "<script>alert('{$message}');</script>";
-        header("Location: register.php");
+        $errorMessage = htmlspecialchars($e->getMessage(), ENT_QUOTES, 'UTF-8');
+        http_response_code($e->getStatusCode());
     }
-    exit;
 }
 ?>
 
@@ -29,6 +27,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <div class="page-shell">
         <h1>BG++</h1>
         <h3 class="subtitle">Register</h3>
+        <?php if (isset($errorMessage)): ?>
+            <div class="error"><?= htmlspecialchars($errorMessage) ?></div>
+        <?php endif; ?>
         <form action="" method="POST">
             <label for="username">Username:</label>
             <input type="text" id="username" name="username" required>
