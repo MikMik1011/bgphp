@@ -26,22 +26,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <link rel="stylesheet" href="css/index.css">
 </head>
 <body>
-    <div class="form-container">
-        <h2>Register</h2>
+    <div class="page-shell">
+        <h1>BG++</h1>
+        <h3 class="subtitle">Register</h3>
         <form action="" method="POST">
-            <div class="form-group">
-                <label for="username">Username:</label>
-                <input type="text" id="username" name="username" required>
-            </div>
-            <div class="form-group">
-                <label for="password">Password:</label>
-                <input type="password" id="password" name="password" required>
-            </div>
-            <div class="form-group">
-                <button type="submit" class="btn">Register</button>
-            </div>
+            <label for="username">Username:</label>
+            <input type="text" id="username" name="username" required>
+
+            <label for="password">Password:</label>
+            <input type="password" id="password" name="password" required>
+
+            <button type="submit">Register</button>
         </form>
-        <p>Already have an account? <a href="login.php">Login here</a>.</p>
+        <a href="login.php">Already have an account? Login here.</a><br>
+        <a href="index.php">Back to home</a>
     </div>
 </body>
 </html>

@@ -16,32 +16,37 @@ if (!isset($_SESSION['user'])) {
 </head>
 
 <body>
-    <div class="profile-container">
-        <h1>Welcome, <span id="username"><?php echo $_SESSION['user']['username'] ?></span></h1>
-        <table class="profile-table">
-            <thead>
-                <tr>
-                    <th>City</th>
-                    <th>Station Name</th>
-                    <th>Note</th>
-                    <th>Action</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>New York</td>
-                    <td>Grand Central</td>
-                    <td>Busy station</td>
-                    <td><button class="remove-btn">Remove</button></td>
-                </tr>
-                <tr>
-                    <td>Los Angeles</td>
-                    <td>Union Station</td>
-                    <td>Historic landmark</td>
-                    <td><button class="remove-btn">Remove</button></td>
-                </tr>
-            </tbody>
-        </table>
+    <div class="page-shell">
+        <h1>BG++</h1>
+        <h3 class="subtitle">Profile</h3>
+        <div class="card-panel">
+            <p>Welcome, <strong id="username"><?php echo htmlspecialchars($_SESSION['user']['username'], ENT_QUOTES, 'UTF-8'); ?></strong></p>
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>City</th>
+                        <th>Station Name</th>
+                        <th>Note</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>New York</td>
+                        <td>Grand Central</td>
+                        <td>Busy station</td>
+                        <td><button type="button">Remove</button></td>
+                    </tr>
+                    <tr>
+                        <td>Los Angeles</td>
+                        <td>Union Station</td>
+                        <td>Historic landmark</td>
+                        <td><button type="button">Remove</button></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <a href="index.php">Back to home</a>
     </div>
 </body>
 
