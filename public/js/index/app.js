@@ -35,6 +35,24 @@
   };
 
   const ui = {
+    setCityBackground(cityKey) {
+      const body = document.body;
+      if (!body || !cityKey) {
+        document.documentElement.style.setProperty("--city-bg-image", "none");
+        return;
+      }
+
+      const src = `/pics/${encodeURIComponent(cityKey)}.jpg`;
+      const img = new Image();
+      img.onload = () => {
+        document.documentElement.style.setProperty("--city-bg-image", `url("${src}")`);
+      };
+      img.onerror = () => {
+        document.documentElement.style.setProperty("--city-bg-image", "none");
+      };
+      img.src = src;
+    },
+
     toggleTable() {
       const shouldShow = Boolean(state.currQuery);
       $("table").css("display", shouldShow ? "table" : "none");
@@ -127,6 +145,7 @@
     async onCityChange() {
       const cityKey = state.getCityRaw();
       cookie.set("bgpp_city", cityKey);
+      ui.setCityBackground(cityKey);
       window.BGPP.MapUI.moveToCityCenter(cityKey, !state.currInterval);
 
       if (!state.allStations[cityKey]) {

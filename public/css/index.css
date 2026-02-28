@@ -1,6 +1,7 @@
 :root {
   --bg-top: #e7edf5;
   --bg-bottom: #dce5ef;
+  --city-bg-image: none;
   --card-bg: #243140;
   --card-bg-hover: #243140;
   --text-main: #eaf1f9;
@@ -13,13 +14,25 @@
   --shadow: none;
 }
 
-body {
-  font-family: Arial, sans-serif;
-  text-align: center;
-  background:
+html {
+  min-height: 100%;
+  background-color: var(--bg-bottom);
+  background-image:
+    var(--city-bg-image),
     radial-gradient(1200px 500px at 10% -10%, rgba(36, 196, 164, 0.14), transparent 55%),
     radial-gradient(1000px 450px at 90% -20%, rgba(15, 93, 133, 0.13), transparent 55%),
     linear-gradient(165deg, var(--bg-top), var(--bg-bottom));
+  background-repeat: no-repeat, no-repeat, no-repeat, no-repeat;
+  background-size: cover, auto, auto, cover;
+  background-position: center, center, center, center;
+  background-attachment: scroll, scroll, scroll, scroll;
+}
+
+body {
+  font-family: Arial, sans-serif;
+  text-align: center;
+  min-height: 100vh;
+  background-color: transparent;
   margin: 0;
   padding: 0;
   color: #112033;
