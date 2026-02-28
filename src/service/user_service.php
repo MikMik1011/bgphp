@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__ . '/../db/db.php';
 require_once __DIR__ . '/../utils/exception.php';
+require_once __DIR__ . '/session_service.php';
 
 function create_user($username, $password, $db = new DB())
 {
@@ -16,9 +17,8 @@ function create_user($username, $password, $db = new DB())
     $db->query($sql, ['username' => $username, 'password' => $hashed_password]);
     $user = get_user_by_username($username, $db);
     unset($user['password']);
-    if (session_status() !== PHP_SESSION_ACTIVE) {
-        session_start();
-    }
+    start_secure_session();
+    session_regenerate_id(true);
     $_SESSION['user'] = $user;
 
     return $user;
@@ -43,9 +43,8 @@ function login_user($username, $password, $db = new DB())
         throw new HTTPException("Invalid username or password", 400);
     }
     unset($user['password']);
-    if (session_status() !== PHP_SESSION_ACTIVE) {
-        session_start();
-    }
+    start_secure_session();
+    session_regenerate_id(true);
     $_SESSION['user'] = $user;
 
     return $user;
@@ -53,9 +52,24 @@ function login_user($username, $password, $db = new DB())
 
 function logout_user()
 {
-    if (session_status() !== PHP_SESSION_ACTIVE) {
-        session_start();
+    start_secure_session();
+    $_SESSION = [];
+
+    if (ini_get('session.use_cookies')) {
+        $params = session_get_cookie_params();
+        $cookie_options = [
+            'expires' => time() - 42000,
+            'path' => $params['path'] ?? '/',
+            'secure' => (bool) ($params['secure'] ?? false),
+            'httponly' => (bool) ($params['httponly'] ?? true),
+            'samesite' => $params['samesite'] ?? 'Lax',
+        ];
+        if (!empty($params['domain'])) {
+            $cookie_options['domain'] = $params['domain'];
+        }
+        setcookie(session_name(), '', $cookie_options);
     }
+
     session_destroy();
 }
 
@@ -65,8 +79,6 @@ function get_user_by_username($username, $db = new DB())
 }
 
 function get_logged_in_user() {
-    if (session_status() !== PHP_SESSION_ACTIVE) {
-        session_start();
-    }
+    start_secure_session();
     return $_SESSION['user'] ?? null;
 }

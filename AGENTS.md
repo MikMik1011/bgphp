@@ -74,3 +74,5 @@ Automated tests are not set up yet (no PHPUnit config currently in repo). For no
 - Profile favorites rows act as quick links to index deep links; keep remove-button behavior separate from row-click navigation.
 - PHP code style: use `snake_case` for custom PHP function/method names, parameter names, and local variables; keep call sites aligned when renaming.
 - Remove dead PHP helpers when unreferenced (verify via `rg` before deletion) to keep services lean.
+- Persist index workflow state in cookies: selected city (`bgpp_city`) and search mode tab (`bgpp_search_mode`) should be restored on load; URL query params still override restored defaults.
+- Session policy is centralized in `src/service/session_service.php` via `start_secure_session()`: 30-day cookie lifetime, `HttpOnly`, `SameSite=Lax`, strict cookie-only session settings, and `Secure` enabled automatically on HTTPS.

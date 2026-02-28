@@ -2,7 +2,7 @@
 require_once __DIR__ . '/../src/service/fav_service.php';
 require_once __DIR__ . '/../src/service/bgpp_service.php';
 
-session_start();
+start_secure_session();
 if (!isset($_SESSION['user'])) {
     header("Location: /login.php");
     exit();

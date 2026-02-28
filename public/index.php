@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__ . "/../src/config/config.php";
-session_start();
+require_once __DIR__ . "/../src/service/session_service.php";
+start_secure_session();
 $logged_in_user = $_SESSION['user'] ?? null;
 ?>
 

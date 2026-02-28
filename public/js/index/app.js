@@ -1,5 +1,17 @@
 (() => {
   const urlParams = new URLSearchParams(window.location.search);
+  const cookie = {
+    get(name) {
+      const escaped = name.replace(/[-[\]/{}()*+?.\\^$|]/g, "\\$&");
+      const match = document.cookie.match(new RegExp(`(?:^|; )${escaped}=([^;]*)`));
+      return match ? decodeURIComponent(match[1]) : null;
+    },
+
+    set(name, value, days = 30) {
+      const expires = new Date(Date.now() + days * 24 * 60 * 60 * 1000).toUTCString();
+      document.cookie = `${name}=${encodeURIComponent(value)}; expires=${expires}; path=/; SameSite=Lax`;
+    },
+  };
 
   const state = {
     currInterval: null,
@@ -114,6 +126,7 @@
   const handlers = {
     async onCityChange() {
       const cityKey = state.getCityRaw();
+      cookie.set("bgpp_city", cityKey);
       window.BGPP.MapUI.moveToCityCenter(cityKey, !state.currInterval);
 
       if (!state.allStations[cityKey]) {
@@ -128,6 +141,7 @@
 
     onSearchModeChange() {
       const searchMode = state.getSearchMode();
+      cookie.set("bgpp_search_mode", searchMode);
       ["name", "coords"].forEach((value) => {
         $(`.${value}-search`).toggle(value === searchMode);
       });
@@ -177,6 +191,21 @@
       if (!$("#dataSaver").is(":checked")) return;
       arrivals.start();
     },
+  };
+
+  const bootstrapFromCookies = () => {
+    const savedMode = cookie.get("bgpp_search_mode");
+    if (savedMode === "name" || savedMode === "coords") {
+      $("#searchMode").val(savedMode);
+    }
+
+    const savedCity = (cookie.get("bgpp_city") || "").trim();
+    if (!savedCity) return;
+
+    const cityExists = $("#city option").toArray().some((option) => option.value === savedCity);
+    if (cityExists) {
+      $("#city").val(savedCity);
+    }
   };
 
   const bootstrapFromUrl = async () => {
@@ -277,6 +306,7 @@
     window.BGPP.MapUI.init();
     $(".select2").select2({ width: "resolve" });
 
+    bootstrapFromCookies();
     bindEvents();
     handlers.onSearchModeChange();
     await handlers.onCityChange();
