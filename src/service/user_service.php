@@ -36,7 +36,9 @@ function login_user($username, $password, $db = new DB())
         throw new HTTPException("Invalid username or password", 400);
     }
     unset($user['password']);
-    session_start();
+    if (session_status() !== PHP_SESSION_ACTIVE) {
+        session_start();
+    }
     $_SESSION['user'] = $user;
 
     return $user;
@@ -44,7 +46,9 @@ function login_user($username, $password, $db = new DB())
 
 function logout_user()
 {
-    session_start();
+    if (session_status() !== PHP_SESSION_ACTIVE) {
+        session_start();
+    }
     session_destroy();
 }
 
@@ -54,6 +58,8 @@ function get_user_by_username($username, $db = new DB())
 }
 
 function get_logged_in_user() {
-    session_start();
+    if (session_status() !== PHP_SESSION_ACTIVE) {
+        session_start();
+    }
     return $_SESSION['user'] ?? null;
 }

@@ -2,6 +2,8 @@ let currInterval;
 let map, layerGroup;
 let currQuery;
 let allStations = {};
+let favoritesSet = new Set();
+let pendingFavoriteAdd = null;
 
 const coloredIcon = (color) => {
   return new L.Icon({
@@ -91,11 +93,150 @@ const getCity = () => {
   return encodeURIComponent($("#city").val());
 };
 
+const getCityRaw = () => {
+  return $("#city").val();
+};
+
+const getSelectedStationUid = () => {
+  const mode = getSearchMode();
+  if (mode === "name") return $("#name-input").val();
+  if (mode === "coords") return $("#coords-input").val();
+  return null;
+};
+
+const showFavoriteMessage = (message, isError = false) => {
+  const messageElem = $("#favorite-message");
+  if (!messageElem.length) return;
+  messageElem.text(message);
+  messageElem.css("color", isError ? "#ff6b6b" : "#1abc9c");
+  messageElem.show();
+};
+
+const getFavoriteKey = (city, uid) => `${city}:${uid}`;
+
+const loadFavorites = async () => {
+  const toggleButton = $("#favorite-toggle-btn");
+  if (!toggleButton.length) return;
+
+  const response = await doAsyncRequest("/api/favorites.php", "GET", undefined, () => {
+    showFavoriteMessage("Could not load favorites.", true);
+  });
+
+  favoritesSet = new Set();
+  if (!response || response.status !== "success" || !Array.isArray(response.data)) {
+    return;
+  }
+
+  response.data.forEach((favorite) => {
+    favoritesSet.add(getFavoriteKey(favorite.city_key, favorite.station_uid));
+  });
+};
+
+const updateFavoriteToggle = () => {
+  const wrapper = $("#favorite-toggle-wrapper");
+  const button = $("#favorite-toggle-btn");
+  if (!wrapper.length || !button.length) return;
+
+  const uid = getSelectedStationUid();
+  if (!currQuery || !uid) {
+    wrapper.hide();
+    return;
+  }
+
+  const city = getCityRaw();
+  const isFavorite = favoritesSet.has(getFavoriteKey(city, uid));
+  const icon = isFavorite ? "★" : "☆";
+  const label = isFavorite ? " Remove from favorites" : " Add to favorites";
+
+  button.html(`<span class="favorite-icon" aria-hidden="true">${icon}</span>${label}`);
+  button.attr("data-action", isFavorite ? "remove" : "add");
+  wrapper.show();
+};
+
+const openFavoriteNoteModal = (city, uid) => {
+  const modal = $("#favorite-note-modal");
+  const input = $("#favorite-note-input");
+  if (!modal.length || !input.length) return;
+
+  pendingFavoriteAdd = { city, uid };
+  input.val("");
+  modal.show();
+  input.trigger("focus");
+};
+
+const closeFavoriteNoteModal = () => {
+  $("#favorite-note-modal").hide();
+  pendingFavoriteAdd = null;
+};
+
+const saveFavoriteWithNote = async () => {
+  if (!pendingFavoriteAdd) return;
+
+  const note = ($("#favorite-note-input").val() || "").trim();
+  if (note.length > 255) {
+    showFavoriteMessage("Note is too long (max 255 chars).", true);
+    return;
+  }
+
+  const { city, uid } = pendingFavoriteAdd;
+  const key = getFavoriteKey(city, uid);
+  const response = await doAsyncRequest("/api/favorites.php", "POST", {
+    action: "add",
+    city,
+    uid,
+    note,
+  }, (error) => {
+    const errorMessage = error?.responseJSON?.message || "Could not update favorites.";
+    showFavoriteMessage(errorMessage, true);
+  });
+
+  if (!response || response.status !== "success") {
+    return;
+  }
+
+  favoritesSet.add(key);
+  showFavoriteMessage("Station added to favorites.");
+  closeFavoriteNoteModal();
+  updateFavoriteToggle();
+};
+
+const handleFavoriteToggle = async () => {
+  const uid = getSelectedStationUid();
+  if (!uid) {
+    showFavoriteMessage("Please select a station first.", true);
+    return;
+  }
+
+  const city = getCityRaw();
+  const key = getFavoriteKey(city, uid);
+  const action = favoritesSet.has(key) ? "remove" : "add";
+
+  if (action === "add") {
+    openFavoriteNoteModal(city, uid);
+    return;
+  }
+
+  const response = await doAsyncRequest("/api/favorites.php", "POST", { action, city, uid }, (error) => {
+    const errorMessage = error?.responseJSON?.message || "Could not update favorites.";
+    showFavoriteMessage(errorMessage, true);
+  });
+
+  if (!response || response.status !== "success") {
+    return;
+  }
+
+  favoritesSet.delete(key);
+  showFavoriteMessage("Station removed from favorites.");
+
+  updateFavoriteToggle();
+};
+
 const onCityChange = async () => {
   let city = getCity();
   moveMapToCityCentre(city);
   if (!allStations[city]) await fetchCityStations(city);
   else fillNameSearch(city);
+  updateFavoriteToggle();
 };
 
 const onSearchModeChange = () => {
@@ -107,6 +248,7 @@ const onSearchModeChange = () => {
       if (value === searchMode) $(`.${value}-search`).show();
       else $(`.${value}-search`).hide();
     });
+  updateFavoriteToggle();
 };
 
 const formatSeconds = (seconds) => {
@@ -228,12 +370,14 @@ const submitByName = () => {
   let uid = encodeURIComponent($("#name-input").val().trim());
   currQuery = { uid: uid };
   spawnInterval(currQuery);
+  updateFavoriteToggle();
 };
 
 const submitByCoords = () => {
   let uid = encodeURIComponent($("#coords-input").val().trim());
   currQuery = { uid: uid };
   spawnInterval(currQuery);
+  updateFavoriteToggle();
 };
 
 const toggleTable = () => {
@@ -321,6 +465,7 @@ const cancelInterval = () => {
   toggleTable();
   $("#stationName").hide();
   $("#lastUpdated").hide();
+  updateFavoriteToggle();
 };
 
 const searchByCoords = async (
@@ -383,9 +528,39 @@ $(document).ready(async () => {
 
   onCityChange();
   onSearchModeChange();
+  await loadFavorites();
+  updateFavoriteToggle();
 
   $("#myForm").submit((event) => {
     event.preventDefault(); // Prevent form from being submitted
     submitHandlers[getSearchMode()]();
+  });
+
+  $("#favorite-toggle-btn").on("click", () => {
+    handleFavoriteToggle();
+  });
+
+  $("#favorite-note-save").on("click", () => {
+    saveFavoriteWithNote();
+  });
+
+  $("#favorite-note-cancel").on("click", () => {
+    closeFavoriteNoteModal();
+  });
+
+  $("#favorite-note-modal").on("click", (event) => {
+    if (event.target.id === "favorite-note-modal") {
+      closeFavoriteNoteModal();
+    }
+  });
+
+  $("#favorite-note-input").on("keydown", (event) => {
+    if (event.key === "Enter") {
+      event.preventDefault();
+      saveFavoriteWithNote();
+    }
+    if (event.key === "Escape") {
+      closeFavoriteNoteModal();
+    }
   });
 });
