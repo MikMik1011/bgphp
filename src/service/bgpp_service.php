@@ -1,6 +1,6 @@
 <?php
-require_once __DIR__ . "/../_config/config.php";
-require_once __DIR__ . "/../_parser/parser.php";
+require_once __DIR__ . "/../config/config.php";
+require_once __DIR__ . "/../parser/parser.php";
 
 function is_valid_city($city)
 {

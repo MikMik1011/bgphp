@@ -1,5 +1,5 @@
 <?php
-require_once "../_service/service.php";
+require_once __DIR__ . "/../../src/service/bgpp_service.php";
 
 header('Content-Type: application/json; charset=utf-8');
 

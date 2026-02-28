@@ -11,6 +11,9 @@ RUN pecl install apcu \
 # Enable Apache mod_rewrite (optional but commonly needed)
 RUN a2enmod rewrite
 
+# Set DocumentRoot to public
+RUN sed -i 's|/var/www/html|/var/www/html/public|g' /etc/apache2/sites-available/000-default.conf
+
 # Set working directory
 WORKDIR /var/www/html
 
