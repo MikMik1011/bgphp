@@ -1,17 +1,17 @@
 <?php
 abstract class BusLogic
 {
-    protected $baseUrl;
+    protected $base_url;
     protected $headers;
 
-    abstract public function getAllStations();
-    abstract public function getStationArrivals($stationUid);
+    abstract public function get_all_stations();
+    abstract public function get_station_arrivals($station_uid);
 
-    public function __construct($baseUrl, $apiKey)
+    public function __construct($base_url, $api_key)
     {
-        $this->baseUrl = $baseUrl;
+        $this->base_url = $base_url;
         $this->headers = [
-            "X-Api-Authentication: $apiKey",
+            "X-Api-Authentication: $api_key",
             "User-Agent: okhttp/4.10.0",
             "Accept: application/json"
         ];

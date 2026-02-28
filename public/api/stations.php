@@ -10,9 +10,9 @@ if (!isset($_GET['city'])) {
     ]);
     exit;
 }
-$cityKey = $_GET['city'];
+$city_key = $_GET['city'];
 
-if (!isset($CITIES[$cityKey])) {
+if (!isset($CITIES[$city_key])) {
     echo json_encode([
         'status' => 'error',
         'message' => 'City not found'
@@ -20,7 +20,7 @@ if (!isset($CITIES[$cityKey])) {
     exit;
 }
 
-$stations = get_stations($cityKey);
+$stations = get_stations($city_key);
 
 echo json_encode([
     'status' => 'success',

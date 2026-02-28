@@ -3,16 +3,16 @@
 class DB {
     private $pdo;
 
-    public function __construct($configFile = __DIR__ . '/../config/config.ini') {
-        if($config = parse_ini_file($configFile)) {
+    public function __construct($config_file = __DIR__ . '/../config/config.ini') {
+        if ($config = parse_ini_file($config_file)) {
             $host = $config["host"];
             $database = $config["database"];
             $user = $config["user"];
             $password = $config["password"];
             $this->pdo = new PDO("mysql:host=$host;dbname=$database", $user, $password);
-        }
-        else
+        } else {
             exit("Missing configuration file.");
+        }
         $this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     }
 
@@ -26,11 +26,11 @@ class DB {
         return $stmt;
     }
 
-    public function fetchAll($sql, $params = []) {
+    public function fetch_all($sql, $params = []) {
         return $this->query($sql, $params)->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    public function fetchOne($sql, $params = []) {
+    public function fetch_one($sql, $params = []) {
         return $this->query($sql, $params)->fetch(PDO::FETCH_ASSOC);
     }
 }

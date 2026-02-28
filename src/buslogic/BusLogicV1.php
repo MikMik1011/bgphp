@@ -7,9 +7,9 @@ class BusLogicV1 extends BusLogic
         'arrivals' => '/publicapi/v1/announcement/announcement.php?ibfm=TM000001&action=get_announcement_data&station_uid='
     ];
 
-    public function getAllStations()
+    public function get_all_stations()
     {
-        $url = $this->baseUrl . $this->endpoints['stations'];
+        $url = $this->base_url . $this->endpoints['stations'];
         $ch = curl_init($url);
         curl_setopt_array($ch, [
             CURLOPT_RETURNTRANSFER => true,
@@ -21,9 +21,9 @@ class BusLogicV1 extends BusLogic
         return json_decode($response, true);
     }
 
-    public function getStationArrivals($stationUid)
+    public function get_station_arrivals($station_uid)
     {
-        $url = $this->baseUrl . $this->endpoints['arrivals'] . $stationUid;
+        $url = $this->base_url . $this->endpoints['arrivals'] . $station_uid;
         $ch = curl_init($url);
         curl_setopt_array($ch, [
             CURLOPT_RETURNTRANSFER => true,

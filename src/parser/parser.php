@@ -1,6 +1,6 @@
 <?php
 
-function parseStations($stations) {
+function parse_stations($stations) {
     $result = [];
     foreach ($stations['stations'] as $station) {
         $result[$station['id']] = [
@@ -16,7 +16,7 @@ function parseStations($stations) {
     return $result;
 }
 
-function parseArrivals($arrivals) {
+function parse_arrivals($arrivals) {
     $result = [];
     if(empty($arrivals) || (isset($arrivals[0]['just_coordinates']) && $arrivals[0]['just_coordinates'] === '1')) {
         return $result;
@@ -24,7 +24,7 @@ function parseArrivals($arrivals) {
     
     foreach (array_reverse($arrivals) as $arrival) {
         $line_number = $arrival['line_number'];
-        $parsedArrival = [
+        $parsed_arrival = [
             'etaSeconds' => $arrival['seconds_left'] ?? 0,
             'etaStations' => $arrival['stations_between'] ?? 0,
             'garageNo' => $arrival['vehicles'][0]['garageNo'] ?? "Unknown",
@@ -42,7 +42,7 @@ function parseArrivals($arrivals) {
             ];
         }
 
-        $result[$line_number]['arrivals'][] = $parsedArrival;
+        $result[$line_number]['arrivals'][] = $parsed_arrival;
     }
     return array_values($result);
 }

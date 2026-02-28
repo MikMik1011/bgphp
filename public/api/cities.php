@@ -5,7 +5,7 @@ header('Content-Type: application/json; charset=utf-8');
 
 $cities = [];
 
-foreach($CITIES as $key => $city) {
+foreach ($CITIES as $key => $city) {
     $cities[] = [
         'key' => $key,
         'name' => $city['name']

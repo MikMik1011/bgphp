@@ -72,3 +72,5 @@ Automated tests are not set up yet (no PHPUnit config currently in repo). For no
 - Location-search helpers must defensively normalize/validate station coordinates and skip malformed entries instead of throwing on `station.coords`.
 - Index supports deep links via query params: `?city=<cityKey>` preselects city; `?city=<cityKey>&uid=<stationUid>` auto-selects station in name mode and starts arrivals.
 - Profile favorites rows act as quick links to index deep links; keep remove-button behavior separate from row-click navigation.
+- PHP code style: use `snake_case` for custom PHP function/method names, parameter names, and local variables; keep call sites aligned when renaming.
+- Remove dead PHP helpers when unreferenced (verify via `rg` before deletion) to keep services lean.

@@ -15,20 +15,20 @@ try {
     $favorites = [];
 }
 
-$favoriteRows = [];
+$favorite_rows = [];
 foreach ($favorites as $favorite) {
-    $cityKey = $favorite['city_key'];
-    if (!isset($CITIES[$cityKey])) {
+    $city_key = $favorite['city_key'];
+    if (!isset($CITIES[$city_key])) {
         continue;
     }
 
     $uid = (int) $favorite['station_uid'];
-    $stations = get_stations($cityKey);
+    $stations = get_stations($city_key);
     $station = $stations[$uid] ?? null;
 
-    $favoriteRows[] = [
-        'city_key' => $cityKey,
-        'city_name' => $CITIES[$cityKey]['name'],
+    $favorite_rows[] = [
+        'city_key' => $city_key,
+        'city_name' => $CITIES[$city_key]['name'],
         'station_uid' => $uid,
         'station_name' => $station['name'] ?? 'Unknown station',
         'station_id' => $station['id'] ?? '',
@@ -73,12 +73,12 @@ foreach ($favorites as $favorite) {
                     </tr>
                 </thead>
                 <tbody id="favorites-table-body">
-                    <?php if (count($favoriteRows) === 0): ?>
+                    <?php if (count($favorite_rows) === 0): ?>
                         <tr id="empty-favorites-row">
                             <td colspan="4">No favorite stations yet.</td>
                         </tr>
                     <?php else: ?>
-                        <?php foreach ($favoriteRows as $row): ?>
+                        <?php foreach ($favorite_rows as $row): ?>
                             <tr class="profile-favorite-row" data-city="<?php echo htmlspecialchars($row['city_key'], ENT_QUOTES, 'UTF-8'); ?>" data-uid="<?php echo (int) $row['station_uid']; ?>">
                                 <td><?php echo htmlspecialchars($row['city_name'], ENT_QUOTES, 'UTF-8'); ?></td>
                                 <td><?php echo htmlspecialchars($row['station_name'], ENT_QUOTES, 'UTF-8'); ?><?php echo $row['station_id'] !== '' ? ' (' . htmlspecialchars($row['station_id'], ENT_QUOTES, 'UTF-8') . ')' : ''; ?></td>

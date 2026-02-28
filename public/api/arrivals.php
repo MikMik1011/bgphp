@@ -10,11 +10,9 @@ if (!isset($_GET['city'])) {
     ]);
     exit;
 }
-$cityKey = $_GET['city'];
+$city_key = $_GET['city'];
 
-$city = $CITIES[$cityKey];
-
-if (!isset($CITIES[$cityKey])) {
+if (!isset($CITIES[$city_key])) {
     echo json_encode([
         'status' => 'error',
         'message' => 'City not found'
@@ -30,12 +28,12 @@ if (!isset($_GET['uid'])) {
     exit;
 }
 
-$stations = get_stations($cityKey);
+$stations = get_stations($city_key);
 
 $uid = $_GET['uid'];
 $station = $stations[$uid] ?? null;
 
-$arrivals = get_arrivals($cityKey, $uid);
+$arrivals = get_arrivals($city_key, $uid);
 
 echo json_encode([
     'status' => 'success',
